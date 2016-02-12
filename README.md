@@ -9,6 +9,4 @@ in that directory as well for instructions on how to run our
 code.
 
 If you would like to see a video of our working simulation, 
-here's a video of it on YouTube:
-
-[YouTube link](https://www.youtube.com/watch?v=vPjEm9cD4XU&feature=youtu.be)
+[here's a video of it on YouTube](https://www.youtube.com/watch?v=vPjEm9cD4XU&feature=youtu.be).
