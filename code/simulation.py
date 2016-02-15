@@ -17,6 +17,7 @@ class Simulation:
         self.grid = grid
         self.num_pedestrians = params.get('num_pedestrians', 500)
         self.visualization = params.get('visualization', False)
+        self.vis_image = params.get('vis_image', 'playMat.png')
 
         self.seed_pedestrians()
 
@@ -46,7 +47,7 @@ class Simulation:
         self.scat = self.ax.scatter([], [], zorder=1)
 
         # Set background image.
-        img = plt.imread('playMat.png')
+        img = plt.imread(self.vis_image)
         plt.imshow(img, extent=(0, 140, 70, 0), zorder=0)
         plt.show()
 

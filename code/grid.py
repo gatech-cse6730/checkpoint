@@ -11,24 +11,18 @@ class Grid:
     """
 
 
-    def __init__(self, max_rows, max_cols, node_file, edge_file, type_map, paths_file=None):
+    def __init__(self, params = {}):
         # Save some important attributes.
-        self.max_rows = max_rows
-        self.max_cols = max_cols
-        self.node_file = node_file
-        self.edge_file = edge_file
-        self.type_map = type_map
-        self.paths_file = paths_file
+        self.node_file = params['node_file']
+        self.edge_file = params['edge_file']
+        self.type_map = params['type_map']
+        self.paths_file = params.get('paths_file', None)
+        self.new_paths_file = params.get('new_paths_file', None)
 
         # Perform initialization of the gridspace.
-        self.initialize_grid()
         self.initialize_nodes()
         self.initialize_edges()
         self.set_paths()
-
-    def initialize_grid(self):
-        # Create a grid with the given number of rows, cols.
-        self.grid = [[0 for x in range(self.max_cols)] for x in range(self.max_rows)]
 
     def initialize_nodes(self):
         reader = NodeReader(self.node_file)
@@ -55,7 +49,7 @@ class Grid:
                 self.destination_nodes.append(node)
 
             # Ad each node to the grid in the appropriate location.
-            self.grid[node.y-1][node.x-1] = node
+            # self.grid[node.y-1][node.x-1] = node
 
     def initialize_edges(self):
         reader = EdgeReader(self.edge_file)
@@ -131,13 +125,14 @@ class Grid:
 
                 if indx % 100 == 0 and indx != 0:
                     percent_done = ((indx+1)/float(num_nodes))*100
-                    print('%d percent done.' % percent_done)
+                    print('%.2f percent done.' % percent_done)
 
-            pickle_outfile = 'paths.pickle'
+            # If we've specified a file to write our shortest paths to,
+            if self.new_paths_file:
+                # Write the paths to a file.
+                with open(self.new_paths_file, 'wb') as f:
+                    pickle.dump(paths_dict, f, -1)
 
-            with open(pickle_outfile, 'wb') as f:
-                pickle.dump(paths_dict, f, -1)
-
-            print('---> Dumped paths to %s.' % pickle_outfile)
+                print('---> Dumped paths to %s.' % pickle_outfile)
 
         print('---> Preprocessing done.')
