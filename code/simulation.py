@@ -48,7 +48,7 @@ class Simulation:
 
         # Set background image.
         img = plt.imread(self.vis_image)
-        plt.imshow(img, extent=(0, 140, 70, 0), zorder=0)
+        plt.imshow(img, zorder=0)
         plt.show()
 
     def update_viz(self, x_vals, y_vals):
@@ -57,7 +57,6 @@ class Simulation:
 
         # Update points to be plotted.
         self.scat = self.ax.scatter(x_vals, y_vals, zorder=1)
-        # plt.scatter(random.randrange(0, 20), random.randrange(0, 15))
 
         # Draw.
         plt.draw()
@@ -115,8 +114,8 @@ class Simulation:
 
                 # Get x,y values for viz
                 if self.visualization:
-                    x_vals.append(ped.current.x)
-                    y_vals.append(ped.current.y)
+                    x_vals.append(ped.current.pixx)
+                    y_vals.append(ped.current.pixy)
 
             for node, peds in target_next_dict.iteritems():
                 ped_len = len(peds)

@@ -9,7 +9,8 @@ grid = Grid({
     'node_file': 'Map_GATech_Stadium.png.vertex',
     'edge_file': 'edges_gatech.csv',
     'type_map': type_map,
-    'new_paths_file': 'paths_gatech.pickle'
+    'paths_file': 'paths_gatech.pickle'
+    #'new_paths_file': 'paths_gatech.pickle'
 })
 
 # Set up a simulation object.

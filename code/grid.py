@@ -84,11 +84,11 @@ class Grid:
         # pickle format, read it in and update the paths attributes on our
         # nodes.
         if self.paths_file:
-
+            # Load the data.
             with open(self.paths_file, 'rb') as f:
                 paths_data = pickle.load(f)
 
-                for node in self.nodes:
+                for node in self.entrance_nodes:
                     data_for_node = paths_data.get(node.node_id, None)
 
                     if data_for_node:
@@ -100,15 +100,14 @@ class Grid:
 
             Printer.pp('Performing preprocessing step to find shortest paths. Please bear with us.')
 
-            num_nodes = len(self.nodes)
+            num_nodes = len(self.entrance_nodes)
 
             # Iterate through every node, setting the paths attribute with the
             # shortest path to each possible destination.
-            for indx, node in enumerate(self.nodes):
-
+            for indx, node in enumerate(self.entrance_nodes):
                 # Ignore the node if it's an exit.
-                if node.node_type == self.type_map['exit']:
-                    continue
+                # if node.node_type == self.type_map['exit']:
+                #     continue
 
                 node_id = node.node_id
 
@@ -119,13 +118,13 @@ class Grid:
 
                     node.paths[destination_node_id] = ShortestPath(self.neighbors_dict,
                                                                    node_id,
-                                                                   destination_node_id).next_node()
+                                                                   destination_node_id).path
 
                 paths_dict[node_id] = node.paths
 
-                if indx % 100 == 0 and indx != 0:
-                    percent_done = ((indx+1)/float(num_nodes))*100
-                    print('%.2f percent done.' % percent_done)
+                # if indx % 100 == 0 and indx != 0:
+                percent_done = ((indx+1)/float(num_nodes))*100
+                print('%.2f percent done.' % percent_done)
 
             # If we've specified a file to write our shortest paths to,
             if self.new_paths_file:
@@ -133,6 +132,6 @@ class Grid:
                 with open(self.new_paths_file, 'wb') as f:
                     pickle.dump(paths_dict, f, -1)
 
-                print('---> Dumped paths to %s.' % pickle_outfile)
+                print('---> Dumped paths to %s.' % self.new_paths_file)
 
         print('---> Preprocessing done.')

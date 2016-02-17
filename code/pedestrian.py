@@ -1,3 +1,5 @@
+import copy
+
 class Pedestrian:
     """ Implements a pedestrian. """
 
@@ -21,6 +23,9 @@ class Pedestrian:
         # The current location of the pedestrian, as a Node.
         self.current = current
 
+        if not self.current.node_type == 3:
+            raise ValueError('The initializing node is not an exit.')
+
         # The pedestrian's final destination, as a Node.
         self.destination = destination
 
@@ -28,8 +33,14 @@ class Pedestrian:
         # grid cells traversed per time step.
         self.speed = speed
 
-        # The desired next node to move to.
-        self.target_next = current.get_next_node(self.destination, node_dict)
+        # Store the pedestrian's shortest path to his destination, as determined
+        # by Dijkstra's algorithm.
+        self.shortest_path = copy.deepcopy(self.current.paths[self.destination.node_id])
+
+        # Initialize the desired next node to move to in the shortest path,
+        # also known as the target next.
+        self.shortest_path.pop(0)
+        self.target_next = node_dict[self.shortest_path.pop(0)]
 
         # Whether the pedestrian has completed egress (i.e., exited the SUI).
         self.egress_complete = False
@@ -56,6 +67,6 @@ class Pedestrian:
             self.current.available = False
 
             # Update the target next.
-            self.target_next = node.get_next_node(self.destination, node_dict)
+            self.target_next = node_dict[self.shortest_path.pop(0)]
 
         return self

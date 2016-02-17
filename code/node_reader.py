@@ -35,9 +35,11 @@ class NodeReader(Reader):
                 # X and y coordinates.
                 x = int(row[0])
                 y = int(row[1])
+                pixx = float(row[2])
+                pixy = float(row[3])
 
                 # Create a new node.
-                newnode = Node(node_id, node_type, x, y)
+                newnode = Node(node_id, node_type, x, y, pixx, pixy)
 
                 # Append it to the nodes array.
                 self.nodes.append(newnode)

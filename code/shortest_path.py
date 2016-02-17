@@ -26,14 +26,17 @@ class ShortestPath:
         self.start = start
         self.end = end
 
-    # Returns the next node in the shortest path.
-    def next_node(self):
-        try:
-            shortest_path = self.shortest_path(self.graph, self.start, self.end)
-        except Exception:
-            return None
+        # Generate the shortest path from the given start to the destination.
+        self.path = self.generate_shortest_path(self.graph, self.start, self.end)
 
-        return shortest_path[1]
+    # Returns the next node in the shortest path.
+    # def next_node(self):
+    #     try:
+    #         shortest_path = self.shortest_path(self.graph, self.start, self.end)
+    #     except Exception:
+    #         return None
+    #
+    #     return shortest_path[1]
 
     # Implements Dijkstra's algorithm, given a graph G, start node_id, and end node_id.
     def dijkstra(self, G, start, end=None):
@@ -87,7 +90,7 @@ class ShortestPath:
         return (D,P)
 
     # Finds the shortest path given a graph G, start node_id, and end node_id.
-    def shortest_path(self, G, start, end):
+    def generate_shortest_path(self, G, start, end):
         """
         Find a single shortest path from the given start vertex to the given end vertex.
         The input has the same conventions as Dijkstra().

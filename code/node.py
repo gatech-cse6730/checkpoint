@@ -16,7 +16,7 @@ class Node:
       A new Node object.
 
     """
-    def __init__(self, node_id, node_type, x, y):
+    def __init__(self, node_id, node_type, x, y, pixx, pixy):
         # A unique identifier for the node.
         self.node_id = node_id
 
@@ -26,6 +26,10 @@ class Node:
         # X and y coordinates for the node in the grid.
         self.x = x
         self.y = y
+
+        # Pixel-space x and y coordinates, for plotting on top of the map.
+        self.pixx = pixx
+        self.pixy = pixy
 
         # Initialize a dictionary to hold the next node in the shortest path
         # for each destination.
