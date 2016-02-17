@@ -23,9 +23,6 @@ class Pedestrian:
         # The current location of the pedestrian, as a Node.
         self.current = current
 
-        if not self.current.node_type == 3:
-            raise ValueError('The initializing node is not an exit.')
-
         # The pedestrian's final destination, as a Node.
         self.destination = destination
 
