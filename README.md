@@ -1,6 +1,6 @@
-# CSE 6730 Project Checkpoint
+# CSE 6730 Project 1 Final Report
 
-This is the project checkpoint for Chris Dunlap, Allen Koh,
+This is the final report for Chris Dunlap, Allen Koh,
 and Matt May.
 
 You'll find our paper as `checkpoint.pdf`. Our Python code can
