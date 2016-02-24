@@ -6,8 +6,8 @@ type_map = { 'sidewalk': 1, 'crosswalk': 2, 'entrance': 3, 'exit': 4 }
 
 # Create a grid object that contains the underlying nodes and path information.
 grid = Grid({
-    'node_file': 'nodes.csv',
-    'edge_file': 'edges.csv',
+    'node_file': './map/nodes.csv',
+    'edge_file': './map/edges.csv',
     'type_map': type_map,
     'paths_file': 'paths_gatech.pickle'
     #'new_paths_file': 'paths_gatech.pickle'
