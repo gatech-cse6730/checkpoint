@@ -17,7 +17,7 @@ grid = Grid({
 simulation = Simulation(grid, {
     'num_pedestrians': 500,
     'visualization': True,
-    'vis_image': 'map.png'
+    'vis_image': './map/map.png'
 })
 
 # Run the simulation.
