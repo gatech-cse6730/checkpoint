@@ -1,4 +1,4 @@
-class CustomRandom(object):
+class CustomRandom():
     """
     Implements a custom random number generator for use in simulation.
     Uses the Lehmer pseudorandom number generator.
