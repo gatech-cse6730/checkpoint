@@ -131,7 +131,8 @@ class Simulation:
                     ped = peds[random.randrange(0, ped_len-1)]
 
                 # Move the ped.
-                ped.move(node, self.grid.node_dict, self.grid.type_map)
+                ped.move(node, self.grid.node_dict, self.grid.type_map,
+                         self.grid.neighbors_dict)
 
             # Update viz.
             if self.visualization:

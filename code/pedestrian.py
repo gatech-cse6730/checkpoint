@@ -1,3 +1,5 @@
+from shortest_path import ShortestPath
+
 import copy
 
 class Pedestrian:
@@ -44,10 +46,64 @@ class Pedestrian:
 
     # Move the pedestrian to a given node. Takes a node (Node), node_dict (Dictionary),
     # and type_map (Dictionary) translating string node types to node_type ids.
-    def move(self, node, node_dict, type_map):
-        # If the requested node is not available to move to, return.
+    def move(self, node, node_dict, type_map, neighbors_dict):
+        # If the requested node is not available to move to, find a neighbor
+        # of the current node that is available.
         if not node.available:
-            return
+            # Initialize a found_node flag to false, that we'll update if we
+            # find a node that we can move to.
+            found_node = False
+
+            # For every neighbor,
+            for node_id in self.current.neighbors:
+                neighbor = node_dict[node_id]
+
+                # If the neighbor is available,
+                if neighbor.available:
+                    print('node not available. processing.')
+
+                    # Set *node*, which is our target node to move to, to
+                    # the neighbor.
+                    node = neighbor
+
+                    # We've found a node to move to.
+                    found_node = True
+
+                    destination_node_id = self.destination.node_id
+
+                    # Check to see if the new node has a path to get to our
+                    # destination.
+                    shortest_path = node.paths.get(destination_node_id, None)
+
+                    # If so,
+                    if shortest_path:
+                        # Update our shortest path to the shortest path of
+                        # the node.
+                        self.shortest_path = copy.deepcopy(shortest_path)
+
+                        print('--> found shortest path. using.')
+                    # If the node doesn't have a path yet computed,
+                    else:
+                        # Compute one.
+                        shortest_path = ShortestPath(neighbors_dict,
+                                                     node.node_id,
+                                                     destination_node_id).path
+
+                        # Update our shortest path.
+                        self.shortest_path = shortest_path
+
+                        # Update the node with the path.
+                        node.paths[destination_node_id] = shortest_path
+
+                        print('---> couldnt find shortest path. recomputed.')
+
+                    # Exit the loop. We're done.
+                    break
+
+            # If we weren't able to find a node to move to,
+            if not found_node:
+                print('found no buddy. not moving him.')
+                return
 
         # The current node is now available.
         self.current.available = True
