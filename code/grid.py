@@ -66,10 +66,10 @@ class Grid:
 
             # Add a new entry to node a's neighbors dict for node b, setting it
             # to the weight.
-            node_a.neighbors[node_b.node_id] = edge.weight
+            node_a.neighbors.append(node_b.node_id)
 
             # Added to make undirected.
-            node_b.neighbors[node_a.node_id] = edge.weight
+            node_b.neighbors.append(node_a.node_id)
 
         # Initialize a dictionary to store just the neighbors.
         self.neighbors_dict = {}
@@ -115,6 +115,9 @@ class Grid:
                     node.paths[destination_node_id] = ShortestPath(self.neighbors_dict,
                                                                    node_id,
                                                                    destination_node_id).path
+
+                    #print('computed path from %d to %d' % (node_id, destination_node_id))
+                    #print('it was ', node.paths[destination_node_id])
 
                 paths_dict[node_id] = node.paths
 
