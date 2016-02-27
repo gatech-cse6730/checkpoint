@@ -102,17 +102,13 @@ class Grid:
 
             num_nodes = len(self.entrance_nodes)
 
-            # Iterate through every node, setting the paths attribute with the
-            # shortest path to each possible destination.
+            # Iterate through every entrance node, updating the *paths*
+            # dictionary attribute to include the shortest path to every
+            # destination node.
             for indx, node in enumerate(self.entrance_nodes):
-                # Ignore the node if it's an exit.
-                # if node.node_type == self.type_map['exit']:
-                #     continue
-
                 node_id = node.node_id
 
-                # Compute the paths for every possible destination, saving only
-                # the next node to move to.
+                # Compute the paths for every possible destination.
                 for destination in self.destination_nodes:
                     destination_node_id = destination.node_id
 
