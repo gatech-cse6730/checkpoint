@@ -50,6 +50,8 @@ class Pedestrian:
         # If the requested node is not available to move to, find a neighbor
         # of the current node that is available.
         if not node.available:
+            print('node not available. processing.')
+
             # Initialize a found_node flag to false, that we'll update if we
             # find a node that we can move to.
             found_node = False
@@ -60,8 +62,6 @@ class Pedestrian:
 
                 # If the neighbor is available,
                 if neighbor.available:
-                    print('node not available. processing.')
-
                     # Set *node*, which is our target node to move to, to
                     # the neighbor.
                     node = neighbor
@@ -81,7 +81,7 @@ class Pedestrian:
                         # the node.
                         self.shortest_path = copy.deepcopy(shortest_path)
 
-                        print('--> found shortest path. using.')
+                        print('---> found shortest path. using.')
                     # If the node doesn't have a path yet computed,
                     else:
                         # Compute one.
