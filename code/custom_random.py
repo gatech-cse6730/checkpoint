@@ -40,6 +40,7 @@ class CustomRandom():
     def uniform_random(self):
         return float(self.next())/self.M
 
-    # Generates an integer random number in the range (min, max).
+    # Generates an uniformly distributed integer random number in the range
+    # (min, max).
     def random_in_range(self, min, max):
         return min + int(self.uniform_random() * ((max - min) + 1))
