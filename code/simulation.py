@@ -56,7 +56,7 @@ class Simulation:
         self.scat.remove()
 
         # Update points to be plotted.
-        self.scat = self.ax.scatter(x_vals, y_vals, zorder=1)
+        self.scat = self.ax.scatter(x_vals, y_vals, zorder=1, color='r')
 
         # Draw.
         plt.draw()
@@ -67,7 +67,7 @@ class Simulation:
     def run(self):
         Printer.pp('Initializing simulation.')
 
-        self.run_simulation()
+        return self.run_simulation()
 
     def run_simulation(self):
         active_peds = []
@@ -75,6 +75,7 @@ class Simulation:
         if self.visualization:
             self.init_viz()
 
+        timesteps = 0
         while True:
             # Initialize for viz.
             if self.visualization:
@@ -138,5 +139,9 @@ class Simulation:
             if self.visualization:
                 self.update_viz(x_vals, y_vals)
 
+            timesteps += 1
+
         print('Simulation completed.')
-        plt.close()
+        if self.visualization:
+            plt.close()
+        return timesteps
