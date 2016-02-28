@@ -1,5 +1,6 @@
 from node_reader import NodeReader
 from edge_reader import EdgeReader
+from intersection_reader import IntersectionReader
 from printer import Printer
 from shortest_path import ShortestPath
 
@@ -14,6 +15,8 @@ class Grid:
     def __init__(self, params = {}):
         # Save some important attributes.
         self.node_file = params['node_file']
+        self.intersection_file = params['intersection_file']
+        self.closed_intersections = params['closed_intersections']
         self.edge_file = params['edge_file']
         self.type_map = params['type_map']
         self.paths_file = params.get('paths_file', None)
@@ -21,6 +24,7 @@ class Grid:
 
         # Perform initialization of the gridspace.
         self.initialize_nodes()
+        self.initialize_intersections()
         self.initialize_edges()
         self.set_paths()
 
@@ -51,6 +55,17 @@ class Grid:
             # Ad each node to the grid in the appropriate location.
             # self.grid[node.y-1][node.x-1] = node
 
+    def initialize_intersections(self):
+        reader = IntersectionReader(self.intersection_file, self.node_dict)
+
+        self.intersections_dict = reader.intersections_dict
+        self.intersections = reader.intersections
+        for int_id in self.closed_intersections:
+            nodes_list = self.intersections_dict.get(int_id)
+            for node in nodes_list:
+                del self.node_dict[node.node_id]
+            del self.intersections_dict[int_id]
+
     def initialize_edges(self):
         reader = EdgeReader(self.edge_file)
 
@@ -64,12 +79,13 @@ class Grid:
             # Look up the second node to make sure it exists.
             node_b = self.node_dict[edge.node_b]
 
-            # Add a new entry to node a's neighbors dict for node b, setting it
-            # to the weight.
-            node_a.neighbors[node_b.node_id] = edge.weight
+            if node_a is not None and node_b is not None:
+                # Add a new entry to node a's neighbors dict for node b, setting it
+                # to the weight.
+                node_a.neighbors[node_b.node_id] = edge.weight
 
-            # Added to make undirected.
-            node_b.neighbors[node_a.node_id] = edge.weight
+                # Added to make undirected.
+                node_b.neighbors[node_a.node_id] = edge.weight
 
         # Initialize a dictionary to store just the neighbors.
         self.neighbors_dict = {}

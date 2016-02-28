@@ -67,7 +67,7 @@ class Simulation:
     def run(self):
         Printer.pp('Initializing simulation.')
 
-        self.run_simulation()
+        return self.run_simulation()
 
     def run_simulation(self):
         active_peds = []
@@ -75,6 +75,7 @@ class Simulation:
         if self.visualization:
             self.init_viz()
 
+        timesteps = 0
         while True:
             # Initialize for viz.
             if self.visualization:
@@ -137,5 +138,8 @@ class Simulation:
             if self.visualization:
                 self.update_viz(x_vals, y_vals)
 
+            timesteps += 1
+
         print('Simulation completed.')
         plt.close()
+        return timesteps
