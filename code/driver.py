@@ -9,8 +9,8 @@ grid = Grid({
     'node_file': './map/nodes.csv',
     'edge_file': './map/edges.csv',
     'type_map': type_map,
-    #'paths_file': './paths/paths_2016-02-22.pickle'
-    'new_paths_file': 'paths_2016-02-27.pickle'
+    'paths_file': './paths/paths_2016-02-27.pickle'
+    #'new_paths_file': 'paths_2016-02-27.pickle'
 })
 
 # Set up a simulation object.

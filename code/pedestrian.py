@@ -69,33 +69,34 @@ class Pedestrian:
                     # We've found a node to move to.
                     found_node = True
 
-                    destination_node_id = self.destination.node_id
+                    # Grab the next node in the shortest path.
+                    next_node_id = self.shortest_path[0]
 
-                    # Check to see if the new node has a path to get to our
-                    # destination.
-                    shortest_path = node.paths.get(destination_node_id, None)
+                    # If the selected node is the same as our desired next node,
+                    if node.node_id == next_node_id:
+                        # Remove it from our shortest path.
+                        self.shortest_path.pop(0)
 
-                    # If so,
-                    if shortest_path:
-                        # Update our shortest path to the shortest path of
-                        # the node.
-                        self.shortest_path = copy.deepcopy(shortest_path)
+                        # Break from the loop.
+                        break
 
-                        print('---> found shortest path. using.')
-                    # If the node doesn't have a path yet computed,
-                    else:
-                        # Compute one.
+                    # Check to see if the selected node has a path to get to our
+                    # next node.
+                    shortest_path = node.paths.get(next_node_id, None)
+
+                    # If not,
+                    if not shortest_path:
+                        # Update our shortest path with the shortest path to
+                        # the next node.
+                        print(node.node_id, next_node_id)
                         shortest_path = ShortestPath(neighbors_dict,
                                                      node.node_id,
-                                                     destination_node_id).path
+                                                     next_node_id).path
 
-                        # Update our shortest path.
-                        self.shortest_path = shortest_path
+                        node.paths[next_node_id] = shortest_path
 
-                        # Update the node with the path.
-                        node.paths[destination_node_id] = shortest_path
-
-                        print('---> couldnt find shortest path. recomputed.')
+                    # Update our shortest path.
+                    self.shortest_path[0:0] = shortest_path[1:-1]
 
                     # Exit the loop. We're done.
                     break
