@@ -1,6 +1,6 @@
 {
-  "name": "paramset1",
-  "num_sims": "10",
+  "name": "config1",
+  "num_sims": "1",
   "parameters":
   [
     {
@@ -8,8 +8,6 @@
       "type": "intersection_closed",
       "data": {
         "intersections": [
-          "1",
-          "2"
         ]
       }
     },

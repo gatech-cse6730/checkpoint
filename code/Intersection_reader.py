@@ -1,4 +1,5 @@
 from reader import Reader
+from intersection import Intersection
 import csv
 
 class IntersectionReader(Reader):

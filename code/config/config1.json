@@ -1,0 +1,43 @@
+{
+  "name": "config1",
+  "num_sims": "1",
+  "parameters":
+  [
+    {
+      "name": "Parameter 1 - closed intersections",
+      "type": "intersection_closed",
+      "data": {
+        "intersections": [
+          "1",
+          "2"
+        ]
+      }
+    },
+    {
+      "name": "Parameter 2 - open intersections",
+      "type": "intersection_open",
+      "data": {
+        "intersections": [
+          "3",
+          "4"
+        ]
+      }
+    },
+    {
+      "name": "Parameter 3 - normal intersections",
+      "type": "intersection_normal",
+      "data": {
+        "intersections": [
+          {
+            "id": "5",
+            "time": "15"
+          },
+          {
+            "id": "6",
+            "time": "20"
+          }
+        ]
+      }
+    }
+  ]
+}

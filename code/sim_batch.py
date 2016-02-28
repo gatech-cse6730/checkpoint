@@ -1,6 +1,7 @@
 import json
 import os
 from grid import Grid
+from simulation import Simulation
 
 import pprint
 pp = pprint.PrettyPrinter(indent=4)
@@ -12,7 +13,9 @@ class SimBatch:
         # dict with time for intersections to open and close
         self.intersection_time = {}
         self.config_path = config_path
+
         self.read_config(config_path)
+        self.initialize_grid()
 
     def read_config(self, config_path):
         with open(config_path) as config_json:
@@ -23,7 +26,6 @@ class SimBatch:
 
         for param in config.get('parameters'):
             p_type = param.get('type')
-            print p_type
             if p_type == 'intersection_closed':
                 self.intersection_conf['closed'] = [int(x) for x in param.get('data').get('intersections')]
             elif p_type == 'intersection_open':
@@ -47,16 +49,17 @@ class SimBatch:
             #'new_paths_file': 'paths_gatech.pickle'
         })
 
-    def run_sims(self):
-        simulation = Simulation(grid, {
-            'num_pedestrians': 500,
-            'visualization': True,
+    def run_sims(self, params = {}):
+        simulation = Simulation(self.grid, {
+            'num_pedestrians': params.get('num_pedestrians', 500),
+            'visualization': params.get('visualization', 500),
             'vis_image': './map/map.png'
         })
         self.results = []
         for run_num in range(self.num_sims):
             res = simulation.run()
             self.results.append(res)
+        self.write_outputs()
 
     def write_outputs(self):
         if not os.path.exists('./results'):
@@ -69,4 +72,5 @@ class SimBatch:
             for res in self.results:
                 res_file.write(res +'\n')
 
-sb = SimBatch('./config/config.json')
+sb = SimBatch('./config/noclosed.json')
+sb.run_sims({'num_pedestrians': 100, 'visualization': True})

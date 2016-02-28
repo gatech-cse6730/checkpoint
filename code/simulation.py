@@ -56,7 +56,7 @@ class Simulation:
         self.scat.remove()
 
         # Update points to be plotted.
-        self.scat = self.ax.scatter(x_vals, y_vals, zorder=1)
+        self.scat = self.ax.scatter(x_vals, y_vals, zorder=1, color='r')
 
         # Draw.
         plt.draw()

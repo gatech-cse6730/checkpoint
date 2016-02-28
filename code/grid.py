@@ -61,7 +61,7 @@ class Grid:
         self.intersections_dict = reader.intersections_dict
         self.intersections = reader.intersections
         for int_id in self.closed_intersections:
-            nodes_list = self.intersections_dict.get(int_id)
+            nodes_list = self.intersections_dict.get(int_id).nodes
             for node in nodes_list:
                 del self.node_dict[node.node_id]
             del self.intersections_dict[int_id]
@@ -74,10 +74,10 @@ class Grid:
 
         for edge in edges:
             # Look up the first node.
-            node_a = self.node_dict[edge.node_a]
+            node_a = self.node_dict.get(edge.node_a)
 
             # Look up the second node to make sure it exists.
-            node_b = self.node_dict[edge.node_b]
+            node_b = self.node_dict.get(edge.node_b)
 
             if node_a is not None and node_b is not None:
                 # Add a new entry to node a's neighbors dict for node b, setting it
