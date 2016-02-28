@@ -1,5 +1,6 @@
 import json
 import os
+import datetime
 from grid import Grid
 from simulation import Simulation
 
@@ -64,13 +65,11 @@ class SimBatch:
     def write_outputs(self):
         if not os.path.exists('./results'):
             os.makedirs('./results')
-        res_file_path = './results/' + self.name + '.txt'
-        if not os.path.exists(res_file_path):
-            os.makedirs(res_file_path)
+        res_file_path = './results/' + self.name + '_' + datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S") + '.txt'
 
         with open(res_file_path, 'w') as res_file:
             for res in self.results:
-                res_file.write(res +'\n')
+                res_file.write(str(res) +'\n')
 
 sb = SimBatch('./config/noclosed.json')
-sb.run_sims({'num_pedestrians': 100, 'visualization': True})
+sb.run_sims({'num_pedestrians': 1, 'visualization': True})

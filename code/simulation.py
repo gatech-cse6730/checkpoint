@@ -141,5 +141,6 @@ class Simulation:
             timesteps += 1
 
         print('Simulation completed.')
-        plt.close()
+        if self.visualization:
+            plt.close()
         return timesteps
