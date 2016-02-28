@@ -36,7 +36,7 @@ class Node:
         self.paths = {}
 
         # List of Node neighbors.
-        self.neighbors = []
+        self.neighbors = {}
 
         # By default, the node is not occupied (i.e., it is available).
         self.available = True

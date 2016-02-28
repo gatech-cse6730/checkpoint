@@ -50,8 +50,6 @@ class Pedestrian:
         # If the requested node is not available to move to, find a neighbor
         # of the current node that is available.
         if not node.available:
-            print('node not available. processing.')
-
             # Initialize a found_node flag to false, that we'll update if we
             # find a node that we can move to.
             found_node = False
@@ -88,7 +86,6 @@ class Pedestrian:
                     if not shortest_path:
                         # Update our shortest path with the shortest path to
                         # the next node.
-                        print(node.node_id, next_node_id)
                         shortest_path = ShortestPath(neighbors_dict,
                                                      node.node_id,
                                                      next_node_id).path
@@ -103,7 +100,6 @@ class Pedestrian:
 
             # If we weren't able to find a node to move to,
             if not found_node:
-                print('found no buddy. not moving him.')
                 return
 
         # The current node is now available.

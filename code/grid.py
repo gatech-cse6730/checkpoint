@@ -48,9 +48,6 @@ class Grid:
             elif node.node_type == self.type_map['exit']:
                 self.destination_nodes.append(node)
 
-            # Ad each node to the grid in the appropriate location.
-            # self.grid[node.y-1][node.x-1] = node
-
     def initialize_edges(self):
         reader = EdgeReader(self.edge_file)
 
@@ -66,10 +63,10 @@ class Grid:
 
             # Add a new entry to node a's neighbors dict for node b, setting it
             # to the weight.
-            node_a.neighbors.append(node_b.node_id)
+            node_a.neighbors[node_b.node_id] = edge.weight
 
             # Added to make undirected.
-            node_b.neighbors.append(node_a.node_id)
+            node_b.neighbors[node_a.node_id] = edge.weight
 
         # Initialize a dictionary to store just the neighbors.
         self.neighbors_dict = {}
@@ -116,12 +113,8 @@ class Grid:
                                                                    node_id,
                                                                    destination_node_id).path
 
-                    #print('computed path from %d to %d' % (node_id, destination_node_id))
-                    #print('it was ', node.paths[destination_node_id])
-
                 paths_dict[node_id] = node.paths
 
-                # if indx % 100 == 0 and indx != 0:
                 percent_done = ((indx+1)/float(num_nodes))*100
                 print('%.2f percent done.' % percent_done)
 
