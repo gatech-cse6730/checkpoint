@@ -1,6 +1,7 @@
 import json
 import os
 import datetime
+from threading import Thread
 from grid import Grid
 from simulation import Simulation
 
@@ -53,7 +54,7 @@ class SimBatch:
     def run_sims(self, params = {}):
         self.results = []
 
-        for run_num in range(self.num_sims):
+        def init_sim():
             simulation = Simulation(self.grid, {
                 'num_pedestrians': params.get('num_pedestrians', 500),
                 'visualization': params.get('visualization', False),
@@ -62,6 +63,21 @@ class SimBatch:
 
             seed, res = simulation.run()
             self.results.append([seed, res])
+
+        threads = []
+
+        for run_num in range(self.num_sims):
+            t = Thread(target=init_sim)
+            threads.append(t)
+            print('appended thread')
+
+        for t in threads:
+            print('started')
+            t.start()
+
+        for t in threads:
+            print('joined')
+            t.join()
 
         self.write_outputs()
 
