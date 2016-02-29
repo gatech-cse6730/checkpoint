@@ -26,12 +26,15 @@ class Intersection:
         self.is_open = False
 
     # Close all the nodes in the intersection.
-    def close_me():
+    def close_me(self):
         # Need to handle case when pedestrian is in the middle of an intersection during closing.
         for node in self.nodes:
             node.available = False
+        self.is_open = False
 
-    # Re-open the intersection by setting all included nodes to available.
-    def open_me():
+    # Re-open the intersection by setting all included & empty nodes to available.
+    def open_me(self):
         for node in self.nodes:
-            node.available = True
+            if node.current_ped is None:
+                node.available = True
+        self.is_open = True
