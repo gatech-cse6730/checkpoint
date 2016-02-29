@@ -69,14 +69,11 @@ class SimBatch:
         for run_num in range(self.num_sims):
             t = Thread(target=init_sim)
             threads.append(t)
-            print('appended thread')
 
         for t in threads:
-            print('started')
             t.start()
 
         for t in threads:
-            print('joined')
             t.join()
 
         self.write_outputs()
