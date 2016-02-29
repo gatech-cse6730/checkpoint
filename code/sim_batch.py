@@ -1,6 +1,8 @@
 import json
 import os
 import datetime
+import sys
+import getopt
 from grid import Grid
 from simulation import Simulation
 
@@ -12,7 +14,7 @@ class SimBatch:
         # dict with list of 'open' and 'closed' intersection ids
         self.intersection_conf = {}
         # dict with time for intersections to open and close
-        self.intersection_time = {}
+        self.intersection_times = {}
         self.config_path = config_path
 
         self.read_config(config_path)
@@ -33,7 +35,7 @@ class SimBatch:
                 self.intersection_conf['open'] = [int(x) for x in param.get('data').get('intersections')]
             elif p_type == 'intersection_normal':
                 for x in (param.get('data').get('intersections')):
-                    self.intersection_time[int(x.get('id'))] = int(x.get('time'))
+                    self.intersection_times[int(x.get('id'))] = int(x.get('time'))
 
     def initialize_grid(self):
         # Create a type map mapping human-readable node types to integer ids.
@@ -57,7 +59,8 @@ class SimBatch:
             simulation = Simulation(self.grid, {
                 'num_pedestrians': params.get('num_pedestrians', 500),
                 'visualization': params.get('visualization', False),
-                'vis_image': './map/map.png'
+                'vis_image': './map/map.png',
+                'intersection_times': self.intersection_times
             })
 
             seed, res = simulation.run()
@@ -74,6 +77,42 @@ class SimBatch:
             for res in self.results:
                 res_file.write(str(res[0]) + ',' + str(res[1]) +'\n')
 
+def main(argv):
+    config_file = None
+    num_peds = None
+    vis_boolean = None
+    try:
+        opts, args = getopt.getopt(argv,"hc:p:v:",["help", "config=", "peds=", "viz="])
+    except getopt.GetoptError:
+        print 'sim_batch.py -c <configJsonFile> -p <int numPeds> -v <t/f vizBoolean>'
+        sys.exit(2)
+
+    for opt, arg in opts:
+        if opt == '-h':
+            print 'sim_batch.py -c <configJsonFile> -p <int numPeds> -v <t/f vizBoolean>'
+            sys.exit()
+        elif opt in ("-c", "--config"):
+            config_file = arg
+        elif opt in ("-p", "--peds"):
+            num_peds = int(arg)
+        elif opt in ("-v", "--viz"):
+            if arg == "t" or arg == "T":
+                vis_boolean = True
+            else:
+                vis_boolean = False
+
+    if config_file == None:
+        print "config file was not given (json file)"
+        sys.exit(2)
+    if num_peds == None:
+        print "number of pedestrians was not given (integer)"
+        sys.exit(2)
+    if vis_boolean == None:
+        print "visualization boolean was not given (t/f)"
+        sys.exit(2)
+
+    sb = SimBatch(config_file)
+    sb.run_sims({'num_pedestrians': num_peds, 'visualization': vis_boolean})
+
 if __name__ == '__main__':
-    sb = SimBatch('./config/noclosed.json')
-    sb.run_sims({'num_pedestrians': 5000, 'visualization': False})
+    main(sys.argv[1:])
