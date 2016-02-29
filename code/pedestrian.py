@@ -1,6 +1,7 @@
 from shortest_path import ShortestPath
 
 import copy
+import random
 
 class Pedestrian:
     """ Implements a pedestrian. """
@@ -54,8 +55,24 @@ class Pedestrian:
             # find a node that we can move to.
             found_node = False
 
+            # If the node I am being moved to (that is currently unavailable)
+            # is occupied by a ped that wants to go to my current node,
+            # perform the move.
+            if node.current_ped.target_next == self.current:
+                # Both the nodes are now available.
+                node.available = True
+                self.current.available = True
+
+                # Perform the moves.
+                self.move(node, node_dict, type_map, neighbors_dict)
+                node.current_ped.move(self.current, node_dict, type_map, neighbors_dict)
+
+            # Shuffle neighbors.
+            neighbors = self.current.neighbors.keys()
+            random.shuffle(neighbors)
+
             # For every neighbor,
-            for node_id in self.current.neighbors:
+            for node_id in neighbors:
                 neighbor = node_dict[node_id]
 
                 # If the neighbor is available,
@@ -115,6 +132,9 @@ class Pedestrian:
         else:
             # Set the new current node to unavailable.
             self.current.available = False
+
+            # Update the *current* node's current ped attribute.
+            self.current.current_ped = self
 
             # Update the target next.
             self.target_next = node_dict[self.shortest_path.pop(0)]

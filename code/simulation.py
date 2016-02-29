@@ -149,12 +149,12 @@ class Simulation:
                          self.grid.type_map, self.grid.neighbors_dict)
 
                 # Get x,y values for viz.
-                if self.visualization:
+                if self.visualization and timesteps % 100 == 0:
                     x_vals.append(ped.current.pixx)
                     y_vals.append(ped.current.pixy)
 
             # Update viz.
-            if self.visualization:
+            if self.visualization and timesteps % 100 == 0:
                 self.update_viz(x_vals, y_vals)
 
             timesteps += 1

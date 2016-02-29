@@ -41,6 +41,9 @@ class Node:
         # By default, the node is not occupied (i.e., it is available).
         self.available = True
 
+        # Store the current pedestrian occupying the node.
+        self.current_ped = None
+
     # For a given destination node, returns the next node in the shortest path.
     def get_next_node(self, dest, node_dict):
         next_node_id = self.paths[dest.node_id]
