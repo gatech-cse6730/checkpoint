@@ -15,7 +15,6 @@ class Simulation:
     Performs a cellular automata simulation using an input Grid object.
     """
 
-
     CELL_WIDTH = 0.5
     PEDS_RATE = 0.81
 
@@ -25,6 +24,7 @@ class Simulation:
         self.visualization = params.get('visualization', False)
         self.vis_image = params.get('vis_image', './map/map.png')
         self.seed = params.get('seed', random.randrange(1, 2**31-1))
+        self.intersection_times = params.get('intersection_times', {})
 
         # Initialize the random number generators.
         self.initialize_rng()
@@ -138,6 +138,17 @@ class Simulation:
             if timesteps % 10 == 0:
                 print(('%d active peds remaining to evacuate. Ped queue count '
                        'is %d.') % (active_peds_remaining, len(self.ped_queue)))
+
+            # For every regular intersection
+            for int_id, int_time in self.intersection_times.iteritems():
+                # If intersection change time is reached
+                if timesteps % int_time == 0:
+                    intersection = self.grid.intersections_dict.get(int_id)
+                    # Change the intersection state
+                    if intersection.is_open:
+                        intersection.close_me()
+                    else:
+                        intersection.open_me()
 
             # For every active pedestrian,
             for indx, ped in enumerate(active_peds):

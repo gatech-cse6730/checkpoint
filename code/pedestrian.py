@@ -58,7 +58,7 @@ class Pedestrian:
             # If the node I am being moved to (that is currently unavailable)
             # is occupied by a ped that wants to go to my current node,
             # perform the move.
-            if node.current_ped.target_next == self.current:
+            if node.current_ped != None and node.current_ped.target_next == self.current:
                 # Both the nodes are now available.
                 node.available = True
                 self.current.available = True
@@ -119,8 +119,9 @@ class Pedestrian:
             if not found_node:
                 return
 
-        # The current node is now available.
+        # The current node is now available and no ped occupies it.
         self.current.available = True
+        self.current.current_ped = None
 
         # Update the current node to the new node.
         self.current = node
