@@ -2,7 +2,7 @@ from printer import Printer
 from pedestrian import Pedestrian
 from custom_random import CustomRandom
 # Python's random module is only used for generating random seeds for our own
-# generator.
+# generator, and list shuffling.
 import random
 # Numpy is used for drawing samples from a Poisson distribution for modeling
 # pedestrian arrivals.
@@ -109,12 +109,14 @@ class Simulation:
 
             # If our pedestrian queue is empty and we have no remaining
             # active pedestrians, break.
-            if len(self.ped_queue) == 0 and len(active_peds) == 0:
+            ped_queue_length = len(self.ped_queue)
+
+            if ped_queue_length == 0 and len(active_peds) == 0:
                 print('Finished!')
                 break
 
-            # If there are pedestrians remaining in our queue
-            if len(self.ped_queue) > 0:
+            # If there are pedestrians remaining in our queue,
+            if ped_queue_length > 0:
                 # Add a number of pedestrians to our SUI corresponding to our
                 # computed entry rate.
                 for each_ped in range(0, np.random.poisson(self.entry_rate)):
@@ -132,9 +134,13 @@ class Simulation:
 
             active_peds_remaining = len(active_peds)
 
-            if active_peds_remaining % 10 == 0:
+            # Print the remaining pedestrians, and pedestrian queue count.
+            if timesteps % 10 == 0:
                 print(('%d active peds remaining to evacuate. Ped queue count '
                        'is %d.') % (active_peds_remaining, len(self.ped_queue)))
+
+            # Reverse the list of active pedestrians.
+            random.shuffle(active_peds)
 
             # For every active pedestrian,
             for indx, ped in enumerate(active_peds):
