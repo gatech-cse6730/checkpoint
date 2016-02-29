@@ -164,4 +164,4 @@ class Simulation:
         if self.visualization:
             plt.close()
 
-        return timesteps
+        return [self.seed, timesteps]
