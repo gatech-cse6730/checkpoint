@@ -1,11 +1,14 @@
 from printer import Printer
 from pedestrian import Pedestrian
-# Note: we will be developing a custom random number generator for the final
-# simulation.
+from custom_random import CustomRandom
+# Python's random module is only used for generating random seeds for our own
+# generator.
 import random
+# Numpy is used for drawing samples from a Poisson distribution for modeling
+# pedestrian arrivals.
+import numpy as np
 import matplotlib
 import matplotlib.pyplot as plt
-import time
 
 class Simulation:
     """
@@ -13,13 +16,29 @@ class Simulation:
     """
 
 
+    CELL_WIDTH = 0.5
+    PEDS_RATE = 0.81
+
     def __init__(self, grid, params = {}):
         self.grid = grid
         self.num_pedestrians = params.get('num_pedestrians', 500)
         self.visualization = params.get('visualization', False)
-        self.vis_image = params.get('vis_image', 'playMat.png')
+        self.vis_image = params.get('vis_image', './map/map.png')
+        self.seed = params.get('seed', random.randrange(1, 2**31-1))
 
+        # Initialize the random number generators.
+        self.initialize_rng()
+
+        # Create a queue of pedestrians for use in the simulation.
         self.seed_pedestrians()
+
+    def initialize_rng(self):
+        # Initialize our custom random number generator.
+        self.rng = CustomRandom(self.seed)
+
+        # Seed numpy's random number generator, for sampling from the Poisson
+        # distribution.
+        np.random.seed(self.seed)
 
     def seed_pedestrians(self):
         num_entrance_nodes = len(self.grid.entrance_nodes)
@@ -29,14 +48,17 @@ class Simulation:
                           for i in range(self.num_pedestrians)]
 
     def generate_pedestrian(self, num_entrance_nodes, num_destination_nodes):
-        # TODO: add random number generator.
-        entrance_node = self.grid.entrance_nodes[random.randrange(0, num_entrance_nodes-1)]
-        destination_node = self.grid.destination_nodes[random.randrange(0, num_destination_nodes-1)]
+        entrance_node = self.grid.entrance_nodes[self.rng.random_in_range(0, num_entrance_nodes-1)]
+        destination_node = self.grid.destination_nodes[self.rng.random_in_range(0, num_destination_nodes-1)]
 
         # TODO: set speed (third argument) dynamically by drawing from a distribution.
         new_ped = Pedestrian(entrance_node, destination_node, 1, self.grid.node_dict)
 
         return new_ped
+
+    def determine_peds_per_second(self):
+        total_entrance_space = len(self.grid.entrance_nodes) * self.CELL_WIDTH
+        self.entry_rate = int(total_entrance_space / self.PEDS_RATE)
 
     # Initialize the Visualization plot.
     def init_viz(self):
@@ -70,35 +92,51 @@ class Simulation:
         return self.run_simulation()
 
     def run_simulation(self):
+        self.determine_peds_per_second()
+
         active_peds = []
 
         if self.visualization:
             self.init_viz()
 
         timesteps = 0
+
         while True:
             # Initialize for viz.
             if self.visualization:
                 x_vals = []
                 y_vals = []
 
-            target_next_dict = {node: [] for node in self.grid.nodes}
-
+            # If our pedestrian queue is empty and we have no remaining
+            # active pedestrians, break.
             if len(self.ped_queue) == 0 and len(active_peds) == 0:
                 print('Finished!')
                 break
 
+            # If there are pedestrians remaining in our queue
             if len(self.ped_queue) > 0:
-                next_ped = self.ped_queue[0]
+                # Add a number of pedestrians to our SUI corresponding to our
+                # computed entry rate.
+                for each_ped in range(0, np.random.poisson(self.entry_rate)):
+                    # If our queue is empty, break from the loop.
+                    if len(self.ped_queue) == 0:
+                        break
 
-                if next_ped.current.available:
-                    active_peds.append(self.ped_queue.pop(0))
+                    # Retrieve the next pedestrian in the queue.
+                    next_ped = self.ped_queue[0]
+
+                    # If her entry node is available, remove her from the queue
+                    # and add her to the SUI.
+                    if next_ped.current.available:
+                        active_peds.append(self.ped_queue.pop(0))
 
             active_peds_remaining = len(active_peds)
 
             if active_peds_remaining % 10 == 0:
-                print('%d active peds remaining to evacuate.' % active_peds_remaining)
+                print(('%d active peds remaining to evacuate. Ped queue count '
+                       'is %d.') % (active_peds_remaining, len(self.ped_queue)))
 
+            # For every active pedestrian,
             for indx, ped in enumerate(active_peds):
                 # If the ped is finished,
                 if ped.egress_complete:
@@ -106,33 +144,14 @@ class Simulation:
                     del active_peds[indx]
                     continue
 
-                # Grab the ped's target next node according to the shortest path algo.
-                target_next = ped.target_next
+                # Move the ped.
+                ped.move(ped.target_next, self.grid.node_dict,
+                         self.grid.type_map, self.grid.neighbors_dict)
 
-                # Add an entry in the node => peds dictionary, telling us that the ped
-                # wants to go to that node.
-                target_next_dict[target_next].append(ped)
-
-                # Get x,y values for viz
+                # Get x,y values for viz.
                 if self.visualization:
                     x_vals.append(ped.current.pixx)
                     y_vals.append(ped.current.pixy)
-
-            for node, peds in target_next_dict.iteritems():
-                ped_len = len(peds)
-
-                if ped_len == 0:
-                    # No pedestrian wants the node, so go to the next iteration.
-                    continue
-                elif ped_len == 1:
-                    # We're done; only one ped wants the node.
-                    ped = peds[0]
-                else:
-                    # Select a ped at random to get the node.
-                    ped = peds[random.randrange(0, ped_len-1)]
-
-                # Move the ped.
-                ped.move(node, self.grid.node_dict, self.grid.type_map)
 
             # Update viz.
             if self.visualization:
@@ -140,7 +159,9 @@ class Simulation:
 
             timesteps += 1
 
-        print('Simulation completed.')
+        print('Simulation completed in %d timesteps.' % timesteps)
+
         if self.visualization:
             plt.close()
+
         return timesteps

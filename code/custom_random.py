@@ -36,6 +36,11 @@ class CustomRandom():
         return self.seed
 
     # Generates a uniformly distributed floating point random number in the
-    # range 0.0, 1.0.
+    # range (0,1).
     def uniform_random(self):
         return float(self.next())/self.M
+
+    # Generates an uniformly distributed integer random number in the range
+    # (min, max).
+    def random_in_range(self, min, max):
+        return min + int(self.uniform_random() * ((max - min) + 1))

@@ -35,7 +35,7 @@ class Node:
         # for each destination.
         self.paths = {}
 
-        # Array of Node neighbors.
+        # List of Node neighbors.
         self.neighbors = {}
 
         # By default, the node is not occupied (i.e., it is available).

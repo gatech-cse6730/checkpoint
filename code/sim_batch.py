@@ -54,7 +54,8 @@ class SimBatch:
         simulation = Simulation(self.grid, {
             'num_pedestrians': params.get('num_pedestrians', 500),
             'visualization': params.get('visualization', 500),
-            'vis_image': './map/map.png'
+            'vis_image': './map/map.png',
+            'seed': 42
         })
         self.results = []
         for run_num in range(self.num_sims):
@@ -71,5 +72,6 @@ class SimBatch:
             for res in self.results:
                 res_file.write(str(res) +'\n')
 
-sb = SimBatch('./config/noclosed.json')
-sb.run_sims({'num_pedestrians': 1, 'visualization': True})
+if __name__ == '__main__':
+    sb = SimBatch('./config/noclosed.json')
+    sb.run_sims({'num_pedestrians': 5000, 'visualization': True})

@@ -76,7 +76,7 @@ class CustomRandomTest():
     def generate_histogram(self):
         # Generate a seed for our generator using Python's random number
         # generator.
-        seed = random.uniform(1, 2**31-1)
+        seed = random.randrange(1, 2**31-1)
         # Initialize our random number generator.
         generator = CustomRandom(seed)
 

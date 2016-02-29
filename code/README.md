@@ -4,7 +4,7 @@ To test our simulation model, first ensure you have Python 2.7 and the
 matplotlib Python module installed. Then, simply execute:
 
 ```
-$ python driver.py
+$ python sim_batch.py
 ```
 
 This will perform a test simulation with 500 pedestrians moving throughout a
