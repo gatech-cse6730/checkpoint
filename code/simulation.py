@@ -16,11 +16,16 @@ class Simulation:
     """
 
 
+    CELL_WIDTH = 0.5
+    PEDS_RATE = 0.81
+    # Set a lambda-parameter, for sampling from the Poisson.
+    LAMBDA = 4.05
+
     def __init__(self, grid, params = {}):
         self.grid = grid
         self.num_pedestrians = params.get('num_pedestrians', 500)
         self.visualization = params.get('visualization', False)
-        self.vis_image = params.get('vis_image', 'playMat.png')
+        self.vis_image = params.get('vis_image', './map/map.png')
         self.seed = params.get('seed', random.randrange(1, 2**31-1))
 
         # Initialize the random number generators.
@@ -52,6 +57,10 @@ class Simulation:
         new_ped = Pedestrian(entrance_node, destination_node, 1, self.grid.node_dict)
 
         return new_ped
+
+    def determine_peds_per_second(self):
+        total_entrance_space = len(self.grid.entrance_nodes) * self.CELL_WIDTH
+        self.entry_rate = int(total_entrance_space / self.PEDS_RATE)
 
     # Initialize the Visualization plot.
     def init_viz(self):
@@ -85,6 +94,8 @@ class Simulation:
         return self.run_simulation()
 
     def run_simulation(self):
+        self.determine_peds_per_second()
+
         active_peds = []
 
         if self.visualization:
@@ -104,15 +115,20 @@ class Simulation:
                 break
 
             if len(self.ped_queue) > 0:
-                next_ped = self.ped_queue[0]
+                for each_ped in range(0, self.entry_rate):
+                    next_ped = self.ped_queue[0]
 
-                if next_ped.current.available:
-                    active_peds.append(self.ped_queue.pop(0))
+                    if next_ped.current.available:
+                        active_peds.append(self.ped_queue.pop(0))
+
+                    if self.ped_queue == 0:
+                        break
 
             active_peds_remaining = len(active_peds)
 
             if active_peds_remaining % 10 == 0:
-                print('%d active peds remaining to evacuate.' % active_peds_remaining)
+                print(('%d active peds remaining to evacuate. Ped queue count '
+                       'is %d.') % (active_peds_remaining, len(self.ped_queue)))
 
             for indx, ped in enumerate(active_peds):
                 # If the ped is finished,

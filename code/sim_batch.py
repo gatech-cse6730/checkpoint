@@ -74,4 +74,4 @@ class SimBatch:
 
 if __name__ == '__main__':
     sb = SimBatch('./config/noclosed.json')
-    sb.run_sims({'num_pedestrians': 500, 'visualization': True})
+    sb.run_sims({'num_pedestrians': 55000, 'visualization': True})
