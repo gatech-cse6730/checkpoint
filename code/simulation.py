@@ -18,8 +18,6 @@ class Simulation:
 
     CELL_WIDTH = 0.5
     PEDS_RATE = 0.81
-    # Set a lambda-parameter, for sampling from the Poisson.
-    LAMBDA = 4.05
 
     def __init__(self, grid, params = {}):
         self.grid = grid
