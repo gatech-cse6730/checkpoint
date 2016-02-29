@@ -107,14 +107,16 @@ class Simulation:
                 x_vals = []
                 y_vals = []
 
+            ped_queue_length = len(self.ped_queue)
+
             # If our pedestrian queue is empty and we have no remaining
             # active pedestrians, break.
-            if len(self.ped_queue) == 0 and len(active_peds) == 0:
+            if ped_queue_length == 0 and len(active_peds) == 0:
                 print('Finished!')
                 break
 
-            # If there are pedestrians remaining in our queue
-            if len(self.ped_queue) > 0:
+            # If there are pedestrians remaining in our queue,
+            if ped_queue_length > 0:
                 # Add a number of pedestrians to our SUI corresponding to our
                 # computed entry rate.
                 for each_ped in range(0, np.random.poisson(self.entry_rate)):
@@ -132,7 +134,8 @@ class Simulation:
 
             active_peds_remaining = len(active_peds)
 
-            if active_peds_remaining % 10 == 0:
+            # Print the remaining pedestrians, and pedestrian queue count.
+            if timesteps % 10 == 0:
                 print(('%d active peds remaining to evacuate. Ped queue count '
                        'is %d.') % (active_peds_remaining, len(self.ped_queue)))
 
@@ -164,4 +167,4 @@ class Simulation:
         if self.visualization:
             plt.close()
 
-        return timesteps
+        return [self.seed, timesteps]
