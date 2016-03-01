@@ -53,7 +53,10 @@ class SimBatch:
         })
 
     def run_sims(self, params = {}):
-        self.results = []
+        if not os.path.exists('./results'):
+            os.makedirs('./results')
+        
+        self.res_file_path = './results/' + self.name + '_' + datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S") + '.txt'
 
         for run_num in range(self.num_sims):
             simulation = Simulation(self.grid, {
@@ -63,20 +66,17 @@ class SimBatch:
                 'intersection_times': self.intersection_times
             })
 
+            # Get the results from the run - both the random number seed used, and the 
+            # number of timesteps.
             seed, res = simulation.run()
-            self.results.append([seed, res])
-
-        self.write_outputs()
-
-    def write_outputs(self):
-        if not os.path.exists('./results'):
-            os.makedirs('./results')
-        res_file_path = './results/' + self.name + '_' + datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S") + '.txt'
-
-        with open(res_file_path, 'w') as res_file:
-            for res in self.results:
-                res_file.write(str(res[0]) + ',' + str(res[1]) +'\n')
-
+            
+            # Write the results to a file.
+            self.write_outputs([seed, res])
+            
+    def write_outputs(self, res):
+        with open(self.res_file_path, 'w') as res_file:
+            res_file.write(str(res[0]) + ',' + str(res[1]) +'\n')
+                
 def main(argv):
     config_file = None
     num_peds = None
