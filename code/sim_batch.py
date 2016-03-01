@@ -18,7 +18,7 @@ class SimBatch:
         self.config_path = config_path
 
         self.read_config(config_path)
-        self.initialize_grid()
+
 
     def read_config(self, config_path):
         with open(config_path) as config_json:
@@ -37,25 +37,42 @@ class SimBatch:
                 for x in (param.get('data').get('intersections')):
                     self.intersection_times[int(x.get('id'))] = int(x.get('time'))
 
-    def initialize_grid(self):
+    def initialize_grid(self, paths_file=None):
         # Create a type map mapping human-readable node types to integer ids.
         type_map = { 'sidewalk': 1, 'crosswalk': 2, 'entrance': 3, 'exit': 4 }
+        self.grid = None
 
-        # Create a grid object that contains the underlying nodes and path information.
-        self.grid = Grid({
-            'node_file': './map/nodes.csv',
-            'intersection_file': './map/intersections.csv',
-            'closed_intersections': self.intersection_conf.get('closed'),
-            'edge_file': './map/edges.csv',
-            'type_map': type_map,
-            'paths_file': './paths/paths_2016-02-22.pickle'
-            #'new_paths_file': 'paths_gatech.pickle'
-        })
+        if paths_file == None:
+            self.pickle_name = self.name + '.pickle'
+            # Create a grid object that contains the underlying nodes and path information.
+            self.grid = Grid({
+                'node_file': './map/nodes.csv',
+                'intersection_file': './map/intersections.csv',
+                'closed_intersections': self.intersection_conf.get('closed'),
+                'edge_file': './map/edges.csv',
+                'type_map': type_map,
+                'new_paths_file': self.pickle_name
+            })
+        else:
+            self.pickle_name = paths_file
+            # Create a grid object that contains the underlying nodes and path information.
+            self.grid = Grid({
+                'node_file': './map/nodes.csv',
+                'intersection_file': './map/intersections.csv',
+                'closed_intersections': self.intersection_conf.get('closed'),
+                'edge_file': './map/edges.csv',
+                'type_map': type_map,
+                'paths_file': paths_file
+            })
 
     def run_sims(self, params = {}):
+        self.initialize_grid(params.get('paths_file', None))
         self.results = []
 
         for run_num in range(self.num_sims):
+            if run_num > 0:
+                self.initialize_grid(self.pickle_name)
+
             simulation = Simulation(self.grid, {
                 'num_pedestrians': params.get('num_pedestrians', 500),
                 'visualization': params.get('visualization', False),
@@ -81,15 +98,16 @@ def main(argv):
     config_file = None
     num_peds = None
     vis_boolean = None
+    paths_file = None
     try:
-        opts, args = getopt.getopt(argv,"hc:p:v:",["help", "config=", "peds=", "viz="])
+        opts, args = getopt.getopt(argv,"hc:p:v:f:",["help", "config=", "peds=", "viz=", "pfile="])
     except getopt.GetoptError:
-        print 'sim_batch.py -c <configJsonFile> -p <int numPeds> -v <t/f vizBoolean>'
+        print 'sim_batch.py -c <configJsonFile> -p <int numPeds> -v <t/f vizBoolean> -f <pathsFile>'
         sys.exit(2)
 
     for opt, arg in opts:
         if opt == '-h':
-            print 'sim_batch.py -c <configJsonFile> -p <int numPeds> -v <t/f vizBoolean>'
+            print 'sim_batch.py -c <configJsonFile> -p <int numPeds> -v <t/f vizBoolean> -f <pathsFile>'
             sys.exit()
         elif opt in ("-c", "--config"):
             config_file = arg
@@ -100,6 +118,8 @@ def main(argv):
                 vis_boolean = True
             else:
                 vis_boolean = False
+        elif opt in ("-f", "--pfile"):
+            paths_file = arg
 
     if config_file == None:
         print "config file was not given (json file)"
@@ -110,9 +130,11 @@ def main(argv):
     if vis_boolean == None:
         print "visualization boolean was not given (t/f)"
         sys.exit(2)
+    if paths_file == None:
+        print "no paths file given. creating a new one for this simulation."
 
     sb = SimBatch(config_file)
-    sb.run_sims({'num_pedestrians': num_peds, 'visualization': vis_boolean})
+    sb.run_sims({'num_pedestrians': num_peds, 'visualization': vis_boolean, 'paths_file': paths_file})
 
 if __name__ == '__main__':
     main(sys.argv[1:])
