@@ -67,7 +67,11 @@ class SimBatch:
 
     def run_sims(self, params = {}):
         self.initialize_grid(params.get('paths_file', None))
-        self.results = []
+        
+        if not os.path.exists('./results'):
+            os.makedirs('./results')
+            
+        self.res_file_path = './results/' + self.name + '_' + datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S") + '.txt'
 
         for run_num in range(self.num_sims):
             if run_num > 0:
@@ -81,18 +85,11 @@ class SimBatch:
             })
 
             seed, res = simulation.run()
-            self.results.append([seed, res])
+            self.write_outputs([seed, res])
 
-        self.write_outputs()
-
-    def write_outputs(self):
-        if not os.path.exists('./results'):
-            os.makedirs('./results')
-        res_file_path = './results/' + self.name + '_' + datetime.datetime.now().strftime("%Y_%m_%d_%H_%M_%S") + '.txt'
-
-        with open(res_file_path, 'w') as res_file:
-            for res in self.results:
-                res_file.write(str(res[0]) + ',' + str(res[1]) +'\n')
+    def write_outputs(self, res):
+        with open(self.res_file_path, 'a+') as res_file:
+            res_file.write(str(res[0]) + ',' + str(res[1]) +'\n')
 
 def main(argv):
     config_file = None
