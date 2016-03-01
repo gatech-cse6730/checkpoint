@@ -1,5 +1,5 @@
 {
-  "name": "config1",
+  "name": "config10",
   "num_sims": "20",
   "parameters":
   [
@@ -8,6 +8,7 @@
       "type": "intersection_closed",
       "data": {
         "intersections": [
+        "3"
         ]
       }
     },
@@ -16,9 +17,9 @@
       "type": "intersection_open",
       "data": {
         "intersections": [
-          "1",
-          "5",
-          "6"
+        "1",
+        "5",
+        "6"
         ]
       }
     },
@@ -30,10 +31,6 @@
           {
             "id": "2",
             "time": "20"
-          },
-          {
-            "id": "3",
-            "time": "25"
           },
           {
             "id": "4",
