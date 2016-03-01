@@ -89,8 +89,10 @@ class Pedestrian:
 
                     # If the selected node is the same as our desired next node,
                     if node.node_id == next_node_id:
-                        # Remove it from our shortest path.
-                        self.shortest_path.pop(0)
+
+                        if len(self.shortest_path) > 0:
+                            # Remove it from our shortest path.
+                            self.shortest_path.pop(0)
 
                         # Break from the loop.
                         break
