@@ -32,6 +32,13 @@ class Simulation:
         # Create a queue of pedestrians for use in the simulation.
         self.seed_pedestrians()
 
+    # Runs the simulation.
+    def run(self):
+        Printer.pp('Initializing simulation.')
+
+        return self.run_simulation()
+
+    # Initializes the random number generator.
     def initialize_rng(self):
         # Initialize our custom random number generator.
         self.rng = CustomRandom(self.seed)
@@ -40,22 +47,37 @@ class Simulation:
         # distribution.
         np.random.seed(self.seed)
 
+    # Seeds the simulation with pedestrians.
     def seed_pedestrians(self):
         num_entrance_nodes = len(self.grid.entrance_nodes)
         num_destination_nodes = len(self.grid.destination_nodes)
 
-        self.ped_queue = [self.generate_pedestrian(num_entrance_nodes, num_destination_nodes)
+        speed_distribution = self.generate_speed_distribution()
+
+        self.ped_queue = [self.generate_pedestrian(num_entrance_nodes,
+                                                   num_destination_nodes,
+                                                   speed_distribution)
                           for i in range(self.num_pedestrians)]
 
-    def generate_pedestrian(self, num_entrance_nodes, num_destination_nodes):
+    # Generates speed distribution for sampling from (see Blue & Adler, 2001).
+    def generate_speed_distribution(self):
+        distribution = [2 for i in range(0, 5)]
+        distribution.extend([3 for i in range(0, 90)])
+        distribution.extend([4 for i in range(0, 5)])
+
+        return distribution
+
+    # Generate a new pedestrian.
+    def generate_pedestrian(self, num_entrance_nodes, num_destination_nodes, speed_distribution):
         entrance_node = self.grid.entrance_nodes[self.rng.random_in_range(0, num_entrance_nodes-1)]
         destination_node = self.grid.destination_nodes[self.rng.random_in_range(0, num_destination_nodes-1)]
 
-        # TODO: set speed (third argument) dynamically by drawing from a distribution.
-        new_ped = Pedestrian(entrance_node, destination_node, 1, self.grid.node_dict)
+        speed = speed_distribution[self.rng.random_in_range(0, 99)]
+        new_ped = Pedestrian(entrance_node, destination_node, speed, self.grid.node_dict)
 
         return new_ped
 
+    # Determine the number of peds/s that will enter the simulation.
     def determine_peds_per_second(self):
         total_entrance_space = len(self.grid.entrance_nodes) * self.CELL_WIDTH
         self.entry_rate = int(total_entrance_space / self.PEDS_RATE)
@@ -73,6 +95,7 @@ class Simulation:
         plt.imshow(img, zorder=0)
         plt.show()
 
+    # Update the visualization.
     def update_viz(self, x_vals, y_vals):
         # Clear existing points.
         self.scat.remove()
@@ -86,11 +109,7 @@ class Simulation:
         # A short pause so Mac OS X 10.11.3 doesn't break.
         plt.pause(0.0001)
 
-    def run(self):
-        Printer.pp('Initializing simulation.')
-
-        return self.run_simulation()
-
+    # Orchestrates the simulation.
     def run_simulation(self):
         self.determine_peds_per_second()
 
@@ -159,8 +178,9 @@ class Simulation:
                     continue
 
                 # Move the ped.
-                ped.move(ped.target_next, self.grid.node_dict,
-                         self.grid.type_map, self.grid.neighbors_dict)
+                for i in range(0, ped.speed):
+                    ped.move(ped.target_next, self.grid.node_dict,
+                             self.grid.type_map, self.grid.neighbors_dict)
 
                 # Get x,y values for viz.
                 if self.visualization and timesteps % 100 == 0:
