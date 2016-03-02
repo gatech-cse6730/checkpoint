@@ -17,5 +17,9 @@
 ##python sim_batch.py -c config/config9.json -p 55000 -v f >log4.log 2>&1 &
 #python sim_batch.py -c config/config2.json -p 55000 -v f -f config2.pickle >config2.log 2>&1 &
 #python sim_batch.py -c config/config5.json -p 55000 -v f -f config5.pickle >config5.log 2>&1 &
+<<<<<<< HEAD
 python sim_batch.py -c config/config3.json -p 55000 -v f -f config3.pickle >config3.log 2>&1 &
 python sim_batch.py -c config/config3.json -p 55000 -v f -f config3.pickle >config3.log 2>&1 &
+=======
+python sim_batch.py -c config/config10.json -p 55000 -v f -f config10.pickle >config10.log 2>&1 &
+>>>>>>> 504b776335a5230bc67ce4adf27040d1e4142ee7
