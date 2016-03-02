@@ -7,7 +7,7 @@ matplotlib and NumPy Python modules installed. Then, simply execute:
 $ python sim_batch.py -c config/config1.json -p 5000 -v t -f paths/config1.pickle
 ```
 
-This will run 20 5000-pedestrian simulations based on configuration 1, which is
+This will run 20 5,000-pedestrian simulations based on configuration 1, which is
 defined in `config/config1.json`.
 
 To see the general format for running our simulation program, simply run:
