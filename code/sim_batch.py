@@ -221,7 +221,7 @@ def main(argv):
     }
 
     # Run the simulations.
-    sb.run_sims()
+    sb.run_sims(sim_opts)
 
 if __name__ == '__main__':
     main(sys.argv[1:])
