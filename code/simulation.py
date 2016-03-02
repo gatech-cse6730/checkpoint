@@ -15,9 +15,12 @@ class Simulation:
     Performs a cellular automata simulation using an input Grid object.
     """
 
+    # Define a few key constants used for generating the Poisson distribution
+    # for pedestrian arrivals.
     CELL_WIDTH = 0.5
     PEDS_RATE = 0.81
 
+    # Initialize the simulation.
     def __init__(self, grid, params = {}):
         self.grid = grid
         self.num_pedestrians = params.get('num_pedestrians', 500)
@@ -32,6 +35,10 @@ class Simulation:
 
         # Create a queue of pedestrians for use in the simulation.
         self.seed_pedestrians()
+
+        # Determine the number of peds per second that will enter the
+        # simulation.
+        self.determine_peds_per_second()
 
     # Runs the simulation.
     def run(self):
@@ -50,11 +57,15 @@ class Simulation:
 
     # Seeds the simulation with pedestrians.
     def seed_pedestrians(self):
+        # Find the number of entrance, and destination nodes.
         num_entrance_nodes = len(self.grid.entrance_nodes)
         num_destination_nodes = len(self.grid.destination_nodes)
 
+        # Create the speed distribution used for sampling from, to give
+        # each pedestrian a random speed.
         speed_distribution = self.generate_speed_distribution()
 
+        # Create the queue of pedestrians (input stream).
         self.ped_queue = [self.generate_pedestrian(num_entrance_nodes,
                                                    num_destination_nodes,
                                                    speed_distribution)
@@ -66,16 +77,22 @@ class Simulation:
         distribution.extend([3 for i in range(0, 90)])
         distribution.extend([4 for i in range(0, 5)])
 
+        # Return the list, which corresponds to the distribution.
         return distribution
 
     # Generate a new pedestrian.
     def generate_pedestrian(self, num_entrance_nodes, num_destination_nodes, speed_distribution):
+        # Select an entrance node and destination node at random.
         entrance_node = self.grid.entrance_nodes[self.rng.random_in_range(0, num_entrance_nodes-1)]
         destination_node = self.grid.destination_nodes[self.rng.random_in_range(0, num_destination_nodes-1)]
 
+        # Select a random speed from the speed distribution.
         speed = speed_distribution[self.rng.random_in_range(0, 99)]
+
+        # Initialize a new Pedestrian object.
         new_ped = Pedestrian(entrance_node, destination_node, speed, self.grid.node_dict)
 
+        # Return the pedestrian.
         return new_ped
 
     # Determine the number of peds/s that will enter the simulation.
@@ -112,15 +129,18 @@ class Simulation:
 
     # Orchestrates the simulation.
     def run_simulation(self):
-        self.determine_peds_per_second()
-
+        # Create a list to hold active pedestrians.
         active_peds = []
 
+        # If visualization has been selected, initialize the plot.
         if self.visualization:
             self.init_viz()
 
+        # Create a timestep counter.
         timesteps = 0
 
+        # If we're doing additional data collection for verification purposes,
+        # initialize a list container for the data.
         if self.verification_logging:
             peds_entering_sim = []
 
@@ -167,15 +187,15 @@ class Simulation:
 
             # Print the remaining pedestrians, and pedestrian queue count.
             if timesteps % 10 == 0:
-                print(('%d active peds remaining to evacuate. Ped queue count '
-                       'is %d.') % (active_peds_remaining, len(self.ped_queue)))
+                print('%d active peds remaining to evacuate. Ped queue count '
+                      'is %d.' % (active_peds_remaining, len(self.ped_queue)))
 
-            # For every regular intersection
+            # For every regular intersection,
             for int_id, int_time in self.intersection_times.iteritems():
-                # If intersection change time is reached
+                # If intersection change time is reached,
                 if timesteps % int_time == 0:
                     intersection = self.grid.intersections_dict.get(int_id)
-                    # Change the intersection state
+                    # Change the intersection state.
                     if intersection.is_open:
                         intersection.close_me()
                     else:
@@ -195,21 +215,26 @@ class Simulation:
                              self.grid.type_map, self.grid.neighbors_dict)
 
                 # Get x,y values for viz.
-                if self.visualization and timesteps % 100 == 0:
+                if self.visualization and timesteps % 10 == 0:
                     x_vals.append(ped.current.pixx)
                     y_vals.append(ped.current.pixy)
 
             # Update viz.
-            if self.visualization and timesteps % 100 == 0:
+            if self.visualization and timesteps % 10 == 0:
                 self.update_viz(x_vals, y_vals)
 
+            # If we are doing additional verification logging, append the number
+            # of peds that entered the simulation that time step to the
+            # list.
             if self.verification_logging and num_peds_entering_sim > 0:
                 peds_entering_sim.append(num_peds_entering_sim)
 
+            # Increment our timesteps.
             timesteps += 1
 
         print('Simulation completed in %d timesteps.' % timesteps)
 
+        # Close the plot.
         if self.visualization:
             plt.close()
 

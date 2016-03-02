@@ -3,6 +3,8 @@ from intersection import Intersection
 import csv
 
 class IntersectionReader(Reader):
+    """ Processes intersections for use in the parametric simulation. """
+
     def __init__(self, filename, node_dict):
         # Initialize an intersection container and an intersection dictionary.
         self.intersections = []

@@ -1,8 +1,6 @@
 class Intersection:
     """
     Implements an intersection, used for parametrically limiting pedestrian flow.
-    Note: the intersection is not yet used in this initial model, but its definition
-        is provided here.
     """
 
 

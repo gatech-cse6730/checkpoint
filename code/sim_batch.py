@@ -11,16 +11,23 @@ import pprint
 pp = pprint.PrettyPrinter(indent=4)
 
 class SimBatch:
-    def __init__(self, config_path):
-        # dict with list of 'open' and 'closed' intersection ids
-        self.intersection_conf = {}
-        # dict with time for intersections to open and close
-        self.intersection_times = {}
-        self.config_path = config_path
+    """
+    Handles batch-running of multiple simulations.
+    """
 
+    # Initialize a SimBatch.
+    def __init__(self, config_path):
+        # Dict with list of 'open' and 'closed' intersection ids.
+        self.intersection_conf = {}
+
+        # Dict with time for intersections to open and close.
+        self.intersection_times = {}
+
+        # Read in the config file at the given path.
+        self.config_path = config_path
         self.read_config(config_path)
 
-
+    # Reads a given configuration file.
     def read_config(self, config_path):
         with open(config_path) as config_json:
             config = json.load(config_json)
@@ -28,6 +35,8 @@ class SimBatch:
         self.name = config.get('name')
         self.num_sims = int(config.get('num_sims'))
 
+        # Iterates through the given parameters, preparing the data for use
+        # in managing the simulation.
         for param in config.get('parameters'):
             p_type = param.get('type')
             if p_type == 'intersection_closed':
@@ -38,11 +47,14 @@ class SimBatch:
                 for x in (param.get('data').get('intersections')):
                     self.intersection_times[int(x.get('id'))] = int(x.get('time'))
 
+    # Initialize the underyling grid (i.e., graph) structure that will be used
+    # in the simulation.
     def initialize_grid(self, paths_file = None):
         # Create a type map mapping human-readable node types to integer ids.
         type_map = { 'sidewalk': 1, 'crosswalk': 2, 'entrance': 3, 'exit': 4 }
         self.grid = None
 
+        # Creates a new grid given a paths file.
         def create_grid(paths_file = None, new_paths_file = None):
             opts = {
                 'node_file': './map/nodes.csv',
@@ -60,34 +72,47 @@ class SimBatch:
 
             self.grid = Grid(opts)
 
+        # If no paths file has been given to us, create one.
         if paths_file == None:
             # Create a grid object that contains the underlying nodes and path
             # information.
             self.pickle_name = self.name + '.pickle'
             create_grid(None, self.pickle_name)
+        # If we have been given a paths file, use it.
         else:
             # Create a grid object that contains the underlying nodes and path
             # information.
             self.pickle_name = paths_file
             create_grid(self.pickle_name, None)
 
+    # Performs the key step - running of multiple simulations.
     def run_sims(self, params = {}):
+        # Initialize the grid.
         self.initialize_grid(params.get('paths_file', None))
 
+        # Determine whether we are doing extra logging for verification
+        # purposes.
         verification_logging = params.get('verification_logging', False)
 
+        # If so, and no directory for holding verification results has been
+        # created, create one.
         if verification_logging and not os.path.exists('./verification'):
             os.makedirs('./verification')
 
+        # Create a directory for holding results if none exists yet.
         if not os.path.exists('./results'):
             os.makedirs('./results')
 
+        # Determine the file path for our results file.
         self.res_file_path = self.filename_with_time('./results/', self.name, '.txt')
 
+        # For each iteration in the given number of simulations,
         for run_num in range(self.num_sims):
+            # Initialize our grid if it hasn't been already.
             if run_num > 0:
                 self.initialize_grid(self.pickle_name)
 
+            # Create a simulation object.
             simulation = Simulation(self.grid, {
                 'num_pedestrians': params.get('num_pedestrians', 500),
                 'visualization': params.get('visualization', False),
@@ -96,13 +121,17 @@ class SimBatch:
                 'verification_logging': verification_logging
             })
 
+            # Do additional logging if necessary.
             if verification_logging:
                 seed, res, ped_distribution = simulation.run()
+                # Write outputs to our results file.
                 self.write_outputs(seed, res, ped_distribution)
             else:
                 seed, res = simulation.run()
+                # Write outputs to our results file.
                 self.write_outputs(seed, res)
 
+    # Writes simulation outputs to a results file.
     def write_outputs(self, seed, res, ped_distribution = None):
         if ped_distribution:
             ped_dist_path = self.filename_with_time('./verification/',
@@ -115,6 +144,7 @@ class SimBatch:
             write_string = str(seed) + ',' + str(res) + '\n'
             res_file.write(write_string)
 
+    # Builds a filename including a timestamp.
     def filename_with_time(self, dirname, filename, ext):
         def time_now():
             return datetime.datetime.now().strftime('%Y_%m_%d_%H_%M_%S')
@@ -122,6 +152,7 @@ class SimBatch:
         return dirname + filename + '_' + time_now() + ext
 
 def main(argv):
+    # Initialize some parameters.
     config_file = None
     num_peds = None
     vis_boolean = False
@@ -132,6 +163,7 @@ def main(argv):
                     '-v <t/f vizBoolean> -f <pathsFile> '
                     '-V <t/f verificationBoolean>')
 
+    # Retrieve command line arguments.
     try:
         opts, args = getopt.getopt(argv,'hc:p:v:f:V:',['help', 'config=',
                                                       'peds=', 'viz=', 'pfile=',
@@ -140,6 +172,7 @@ def main(argv):
         print(help_message)
         sys.exit(2)
 
+    # Process command line arguments.
     for opt, arg in opts:
         if opt == '-h':
             print(help_message)
@@ -176,11 +209,19 @@ def main(argv):
     if paths_file == None:
         print 'no paths file given. creating a new one for this simulation.'
 
+    # Initialize a new SimBatch.
     sb = SimBatch(config_file)
-    sb.run_sims({ 'num_pedestrians': num_peds,
-                  'visualization': vis_boolean,
-                  'paths_file': paths_file,
-                  'verification_logging': verification_logging })
+
+    # Set some opts for our SimBatch.
+    sim_opts = {
+        'num_pedestrians': num_peds,
+        'visualization': vis_boolean,
+        'paths_file': paths_file,
+        'verification_logging': verification_logging
+    }
+
+    # Run the simulations.
+    sb.run_sims()
 
 if __name__ == '__main__':
     main(sys.argv[1:])
