@@ -25,6 +25,7 @@ class Simulation:
         self.vis_image = params.get('vis_image', './map/map.png')
         self.seed = params.get('seed', random.randrange(1, 2**31-1))
         self.intersection_times = params.get('intersection_times', {})
+        self.verification_logging = params.get('verification_logging', False)
 
         # Initialize the random number generators.
         self.initialize_rng()
@@ -120,11 +121,17 @@ class Simulation:
 
         timesteps = 0
 
+        if self.verification_logging:
+            peds_entering_sim = []
+
         while True:
             # Initialize for viz.
             if self.visualization:
                 x_vals = []
                 y_vals = []
+
+            if self.verification_logging:
+                num_peds_entering_sim = 0
 
             ped_queue_length = len(self.ped_queue)
 
@@ -145,6 +152,11 @@ class Simulation:
 
                     # Retrieve the next pedestrian in the queue.
                     next_ped = self.ped_queue[0]
+
+                    # If we're doing extra verification, log the proposed
+                    # addition of the ped to the simulation.
+                    if self.verification_logging:
+                        num_peds_entering_sim += 1
 
                     # If her entry node is available, remove her from the queue
                     # and add her to the SUI.
@@ -191,6 +203,9 @@ class Simulation:
             if self.visualization and timesteps % 100 == 0:
                 self.update_viz(x_vals, y_vals)
 
+            if self.verification_logging and num_peds_entering_sim > 0:
+                peds_entering_sim.append(num_peds_entering_sim)
+
             timesteps += 1
 
         print('Simulation completed in %d timesteps.' % timesteps)
@@ -198,4 +213,9 @@ class Simulation:
         if self.visualization:
             plt.close()
 
-        return [self.seed, timesteps]
+        retval = [self.seed, timesteps]
+
+        if self.verification_logging:
+            retval.append(peds_entering_sim)
+
+        return retval
