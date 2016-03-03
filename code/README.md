@@ -40,6 +40,19 @@ The results of the simulations will also be logged to a file in the `results`
 subdirectory. Each line in a results file corresponds to a
 `<random_seed, number_of_timesteps>` pair for a particular simulation.
 
+# Random number generator
+
+To test the random number generator, simply execute:
+
+```
+$ python custom_random_test.py
+```
+
+This will perform 100,000 iterations of a test procedure in which 1000 samples
+are drawn from our custom generator. It will compute the chi-square statistic
+for each test and compare it with the critical value, and at the end of the test
+procedure will print the percentage of failures.
+
 # Video
 
 Here is a video of an example simulation run:
